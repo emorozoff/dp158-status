@@ -205,8 +205,8 @@ p,h1,h2,ol,dl,dd{margin:0}
     if(!S){ el.dataset.tone = linkError ? 'bad' : 'idle'; set('freshText', linkError || 'жду данные'); return; }
     var age = now - new Date(S.checkedAt).getTime();
     if(linkError){ el.dataset.tone = 'bad'; set('freshText', linkError); }
-    else if(age < 150000){ el.dataset.tone = 'ok'; set('freshText', 'сверено ' + ago(age)); }
-    else if(age < 360000){ el.dataset.tone = 'warn'; set('freshText', 'сверено ' + ago(age)); }
+    else if(age < (S.pollSec || 30) * 1300 + 110000){ el.dataset.tone = 'ok'; set('freshText', 'сверено ' + ago(age)); }
+    else if(age < (S.pollSec || 30) * 2500 + 280000){ el.dataset.tone = 'warn'; set('freshText', 'сверено ' + ago(age)); }
     else { el.dataset.tone = 'bad'; set('freshText', 'нет обновлений с ' + hm(S.checkedAt)); }
   }
 
