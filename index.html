@@ -233,7 +233,7 @@ p,h1,h2,ol,dl,dd{margin:0}
     }
     else if(ph === 'airborne'){
       label = 'В воздухе'; tone = 'air';
-      rows.push(['Вылетел', hmDay(d.actual)]);
+      rows.push(['Вылетел', hmDay(d.actual) + (d.actualAssumed ? ' (по табло, взлёт не подтверждён)' : '')]);
       rows.push(['Посадка', '≈' + hmDay(a.best)]);
       rows.push(toArr > 0 ? ['До посадки', '≈' + dur(toArr)] : ['Посадка ожидалась', dur(toArr) + ' назад']);
     }
