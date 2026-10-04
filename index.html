@@ -1,0 +1,449 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex"><style>body{margin:0}[hidden]{display:none!important}</style><script>window.DP158_GIST="822bd9d43c806727b9f493c15364e713";</script></head><body><title>Рейс DP 158</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Martian+Mono:wdth,wght@75..112.5,100..800&display=swap">
+<style>
+/* Layout: одна узкая колонка, как посадочный талон — статус, маршрут с двумя временами, детали, лента изменений */
+:root{
+  --bg:#edf0f5; --surface:#ffffff; --ink:#141b2b; --muted:#5c6780; --line:#d6dce8;
+  --accent:#1d5fd1; --ok:#167a3e; --warn:#b3540a; --bad:#bf2630;
+  --tone:var(--muted);
+  --font-body:"Golos Text",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --font-data:"Martian Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0b111e; --surface:#131b2c; --ink:#e8edf8; --muted:#8f9bb6; --line:#243049;
+    --accent:#74a7ff; --ok:#4fd183; --warn:#f5b23d; --bad:#ff7a7a; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0b111e; --surface:#131b2c; --ink:#e8edf8; --muted:#8f9bb6; --line:#243049;
+  --accent:#74a7ff; --ok:#4fd183; --warn:#f5b23d; --bad:#ff7a7a; color-scheme:dark;
+}
+[data-tone="ok"]{--tone:var(--ok)}
+[data-tone="warn"]{--tone:var(--warn)}
+[data-tone="bad"]{--tone:var(--bad)}
+[data-tone="air"]{--tone:var(--accent)}
+[data-tone="idle"]{--tone:var(--muted)}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.45}
+.wrap{max-width:560px;margin-inline:auto;padding-inline:16px;padding-block:20px 40px;display:flex;flex-direction:column;gap:20px}
+.num{font-family:var(--font-data);font-stretch:87.5%;font-variant-numeric:tabular-nums}
+p,h1,h2,ol,dl,dd{margin:0}
+
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.ident h1{font-family:var(--font-data);font-stretch:87.5%;font-size:1.25rem;font-weight:700;letter-spacing:.02em}
+.ident p{color:var(--muted);font-size:.875rem}
+.fresh{display:flex;align-items:center;gap:8px;font-size:.8125rem;color:var(--muted);padding-block:4px}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--tone);flex:none}
+.fresh[data-tone="ok"] .dot{animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.35}}
+@media (prefers-reduced-motion: reduce){.fresh[data-tone="ok"] .dot{animation:none}}
+
+.status{display:flex;flex-direction:column;gap:6px}
+.status-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.side{display:flex;flex-direction:column;align-items:flex-end;gap:1px;flex:none;padding-top:4px}
+.flightno{font-family:var(--font-data);font-stretch:87.5%;font-size:1rem;font-weight:700;letter-spacing:.02em;color:var(--ink)}
+.side .fresh{padding-block:0;font-size:.75rem}
+
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.steps li{display:grid;grid-template-columns:18px 1fr auto;gap:10px;align-items:start;padding-bottom:11px;position:relative;font-size:.9375rem}
+.steps li:last-child{padding-bottom:0}
+.steps li::before{content:"";position:absolute;left:8px;top:19px;bottom:-1px;width:2px;background:var(--line)}
+.steps li:last-child::before{display:none}
+.steps li.done::before{background:var(--ok)}
+.steps .mk{width:18px;height:18px;border-radius:50%;border:2px solid var(--line);background:var(--bg);position:relative;z-index:1;margin-top:1px}
+.steps li.done .mk{background:var(--ok);border-color:var(--ok)}
+.steps li.done .mk::after{content:"";position:absolute;left:4px;top:1px;width:4px;height:8px;border:solid var(--bg);border-width:0 2px 2px 0;transform:rotate(45deg)}
+.steps li.now .mk{border-color:var(--tone);animation:pulse 2s ease-in-out infinite}
+.steps .nm{min-width:0;color:var(--muted)}
+.steps li.done .nm{color:var(--ink)}
+.steps li.now .nm{color:var(--ink);font-weight:600}
+.steps time{font-family:var(--font-data);font-stretch:87.5%;font-variant-numeric:tabular-nums;font-size:.8125rem;color:var(--muted);padding-top:2px}
+.steps li.done time,.steps li.now time{color:var(--ink)}
+@media (prefers-reduced-motion: reduce){.steps li.now .mk{animation:none}}
+.status-label{font-size:clamp(2rem,10vw,2.75rem);font-weight:700;line-height:1.05;color:var(--tone);text-wrap:balance;letter-spacing:-.01em}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:5px 16px;margin-top:6px;font-size:.9375rem}
+.kv div{display:contents}
+.kv dt{color:var(--muted)}
+.kv dd{font-weight:500;min-width:0;overflow-wrap:anywhere}
+.kv a{color:var(--accent)}
+
+.sky{display:flex;flex-direction:column;gap:6px;border:1px solid var(--tone);border-radius:14px;padding:14px 16px}
+.sky-head{display:flex;align-items:center;gap:10px;font-weight:600;color:var(--tone)}
+.sky-head span{min-width:0}
+.sky .note{color:var(--ink);font-size:.875rem;white-space:pre-line}
+.sky a{color:var(--muted);font-size:.8125rem}
+.sky-list{list-style:none;margin:2px 0 0;padding:8px 0 0;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:5px}
+.sky-list li{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 8px;min-width:0;font-size:.875rem}
+.sky-list .dot{width:7px;height:7px}
+.sky-list a{color:var(--ink);font-size:inherit;text-decoration-color:var(--muted)}
+.sky-list small{color:var(--muted);font-size:.75rem}
+.sky-hint{color:var(--muted);font-size:.8125rem}
+
+.route{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 18px 16px;display:flex;flex-direction:column;gap:14px}
+.ends,.times{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.right{text-align:right}
+.iata{display:block;font-family:var(--font-data);font-stretch:87.5%;font-weight:700;font-size:1.125rem;letter-spacing:.04em}
+.city{display:block;color:var(--muted);font-size:.8125rem}
+.track{position:relative;height:22px}
+.track::before{content:"";position:absolute;inset:10px 0 auto 0;border-top:2px dashed var(--line)}
+.fill{position:absolute;left:0;top:10px;height:2px;width:0;background:var(--tone);transition:width .6s}
+.plane{position:absolute;top:0;left:0;width:22px;height:22px;margin-left:-11px;color:var(--tone);background:var(--surface);transition:left .6s}
+.plane svg{display:block;width:22px;height:22px}
+.k{display:block;color:var(--muted);font-size:.75rem;text-transform:uppercase;letter-spacing:.08em}
+.v{display:block;font-family:var(--font-data);font-stretch:87.5%;font-variant-numeric:tabular-nums;font-weight:600;font-size:clamp(1.75rem,9vw,2.25rem);line-height:1.15}
+.note{display:block;color:var(--muted);font-size:.8125rem;min-width:0;overflow-wrap:anywhere}
+.note s{text-decoration-thickness:1px}
+
+.leave{display:grid;grid-template-columns:auto 1fr;gap:6px 20px;align-items:center;border-block:1px solid var(--line);padding-block:14px}
+.leave .v{color:var(--tone)}
+.leave .note{font-size:.875rem;color:var(--ink)}
+@media (max-width:440px){.leave{grid-template-columns:1fr}}
+
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 12px}
+.facts div{min-width:0}
+.facts dt{color:var(--muted);font-size:.75rem;text-transform:uppercase;letter-spacing:.08em}
+.facts dd{font-family:var(--font-data);font-stretch:87.5%;font-weight:600;font-size:1.0625rem;overflow-wrap:anywhere}
+
+.log h2{font-size:.75rem;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.log ol{list-style:none;padding:0;display:flex;flex-direction:column}
+.log li{display:grid;grid-template-columns:3.6em 1fr;gap:12px;padding-block:9px;border-top:1px solid var(--line);font-size:.9375rem}
+.log li time{font-family:var(--font-data);font-stretch:87.5%;font-variant-numeric:tabular-nums;color:var(--muted);font-size:.8125rem;padding-top:2px}
+.log li span{min-width:0;overflow-wrap:anywhere}
+.log .empty{display:block;color:var(--muted)}
+
+.src{color:var(--muted);font-size:.8125rem;border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:4px}
+.src b{font-weight:500;color:var(--ink)}
+.src .off{color:var(--warn)}
+</style>
+
+<main class="wrap">
+  <section class="status" id="status" data-tone="idle">
+    <div class="status-top">
+      <p class="status-label" id="stLabel">Жду табло</p>
+      <div class="side">
+        <h1 class="flightno">DP 158</h1>
+        <div class="fresh" id="fresh" data-tone="idle"><i class="dot"></i><span id="freshText">жду данные</span></div>
+      </div>
+    </div>
+    <dl class="kv" id="kv"><div><dt>Данные</dt><dd>появятся через несколько секунд</dd></div></dl>
+  </section>
+
+  <ol class="steps" id="steps" data-tone="idle" hidden></ol>
+
+  <section class="sky" id="sky" data-tone="idle" hidden>
+    <div class="sky-head"><i class="dot"></i><span id="skyT"></span></div>
+    <p class="note" id="skyN"></p>
+    <ul class="sky-list" id="skyList" hidden></ul>
+  </section>
+
+  <section class="route" id="route" data-tone="idle">
+    <div class="track"><div class="fill" id="fill"></div>
+      <div class="plane" id="plane"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M21.5 12c0-.9-.7-1.5-1.6-1.5h-4.7L10.4 3H8.300l2.400 7.500H6.200L4.400 8.200H2.700l1.100 3.800-1.100 3.800h1.700l1.800-2.300h4.500L8.300 21h2.100l4.800-7.500h4.700c.9 0 1.600-.6 1.600-1.500z"/></svg></div>
+    </div>
+    <div class="times">
+      <div><span class="k" id="depK">Вылет</span><span class="v" id="depV">—</span><span class="note" id="depN"></span></div>
+      <div class="right"><span class="k" id="arrK">Прилёт</span><span class="v" id="arrV">—</span><span class="note" id="arrN"></span></div>
+    </div>
+  </section>
+
+  <section class="leave" id="leave" data-tone="idle">
+    <div><span class="k">Выезжать во Внуково</span><span class="v" id="lvV">—</span></div>
+    <p class="note" id="lvN">Посчитаю, когда появится время прилёта.</p>
+  </section>
+
+  <dl class="facts">
+    <div><dt>Выход</dt><dd id="fGate">—</dd></div>
+    <div><dt>Терминал</dt><dd id="fTerm">—</dd></div>
+    <div><dt>Стойки</dt><dd id="fDesks">—</dd></div>
+    <div><dt>Во Внуково</dt><dd id="fArrTerm">—</dd></div>
+    <div><dt>Багаж</dt><dd id="fBelt">—</dd></div>
+    <div><dt>В пути</dt><dd id="fBlock">—</dd></div>
+  </dl>
+
+  <section class="log">
+    <h2>Что менялось</h2>
+    <ol id="log"><li><span class="empty">Изменения появятся здесь.</span></li></ol>
+  </section>
+
+  <footer class="src">
+    <span id="srcList">Источники: табло и телеграм-канал аэропорта Краснодар, канал мэра, оповещения РСЧС, «Радар», Яндекс Расписания, Flightradar24, FlightAware.</span>
+  </footer>
+</main>
+
+<script>
+(function(){
+  var TZ = 'Europe/Moscow';
+  var S = null, linkError = '';
+  var $ = function(id){ return document.getElementById(id); };
+
+  function hm(iso){
+    if(!iso) return '—';
+    return new Date(iso).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit',timeZone:TZ});
+  }
+  function dayOf(d){ return d.toLocaleDateString('ru-RU',{day:'numeric',month:'short',timeZone:TZ}); }
+  function hmDay(iso){
+    if(!iso) return '—';
+    var base = new Date(S.date + 'T12:00:00+03:00'), d = new Date(iso);
+    return dayOf(d) === dayOf(base) ? hm(iso) : hm(iso) + ' · ' + dayOf(d);
+  }
+  function dur(ms){
+    var m = Math.round(Math.abs(ms)/60000);
+    if(m < 1) return 'меньше минуты';
+    var h = Math.floor(m/60), r = m % 60;
+    return [h ? h + ' ч' : '', (r || !h) ? r + ' мин' : ''].filter(Boolean).join(' ');
+  }
+  function ago(ms){
+    var s = Math.max(0, Math.round(ms/1000));
+    return s < 90 ? s + ' с назад' : dur(ms) + ' назад';
+  }
+  function set(id, text){ var el = $(id); if(el.textContent !== text) el.textContent = text; }
+
+  function paintFresh(now){
+    var el = $('fresh');
+    if(!S){ el.dataset.tone = linkError ? 'bad' : 'idle'; set('freshText', linkError || 'жду данные'); return; }
+    var age = now - new Date(S.checkedAt).getTime();
+    if(linkError){ el.dataset.tone = 'bad'; set('freshText', linkError); }
+    else if(age < 150000){ el.dataset.tone = 'ok'; set('freshText', 'сверено ' + ago(age)); }
+    else if(age < 360000){ el.dataset.tone = 'warn'; set('freshText', 'сверено ' + ago(age)); }
+    else { el.dataset.tone = 'bad'; set('freshText', 'нет обновлений с ' + hm(S.checkedAt)); }
+  }
+
+  function paint(){
+    var now = Date.now();
+    paintFresh(now);
+    if(!S) return;
+    var d = S.dep, a = S.arr, ph = S.phase, late = S.delayMin >= 15;
+    var label, tone, rows = [];
+    var real = d.real && !d.actual ? d.real : null;
+    var toDep = new Date(real || d.est).getTime() - now;
+    var toArr = new Date(a.best).getTime() - now;
+    var inb = S.inbound;
+
+    if(ph === 'cancelled'){
+      label = 'Отменён'; tone = 'bad';
+      rows.push(['Статус в аэропорту', d.status ? '«' + d.status + '»' : 'рейс отменён']);
+    }
+    else if(ph === 'landed'){
+      label = 'Приземлился'; tone = 'ok';
+      rows.push(['Сел во Внуково', hmDay(a.actual)]);
+      if(a.belt) rows.push(['Багаж', 'лента ' + a.belt]);
+      rows.push(['Прошло', dur(now - new Date(a.actual).getTime())]);
+    }
+    else if(ph === 'airborne'){
+      label = 'В воздухе'; tone = 'air';
+      rows.push(['Вылетел', hmDay(d.actual)]);
+      rows.push(['Посадка', '≈' + hmDay(a.best)]);
+      rows.push(toArr > 0 ? ['До посадки', '≈' + dur(toArr)] : ['Посадка ожидалась', dur(toArr) + ' назад']);
+    }
+    else {
+      tone = late ? 'warn' : 'ok';
+      if(ph === 'gate_closed'){ label = 'Посадка закончена'; tone = 'air'; }
+      else if(ph === 'boarding'){ label = 'Идёт посадка'; tone = 'air'; }
+      else if(ph === 'checkin'){ label = late ? 'Задержан' : 'Идёт регистрация'; }
+      else if(ph === 'delayed'){ label = 'Задержан'; }
+      else { label = 'По расписанию'; }
+      if(d.status) rows.push(['Статус в аэропорту', '«' + d.status + '»']);
+      // что табло Краснодара пишет про прилёт самолёта; устаревшее время не показываем
+      var inbAt = inb && /^\d{1,2}:\d{2}$/.test(inb.time)
+        ? new Date(S.date + 'T' + (inb.time.length < 5 ? '0' : '') + inb.time + ':00+03:00').getTime() : 0;
+      if(inbAt > now) rows.push(['Прилёт самолёта по табло', inb.time + (inb.status ? ', «' + inb.status + '»' : '')]);
+    }
+    if(a.diverted && ph !== 'landed'){ tone = 'bad'; rows.push(['Запасной аэродром', 'рейс уходит на запасной']); }
+    // где сейчас самолёт по Flightradar24
+    var pl = S.plane;
+    if(pl && ph !== 'landed' && ph !== 'cancelled'){
+      var where = pl.gnd
+        ? 'на земле' + (pl.nearMrv ? ' в Минводах' : pl.distKm <= 15 ? (pl.dest === 'KRR' ? ' в Краснодаре' : ' во Внуково') : '')
+        : pl.distKm + ' км до ' + (pl.dest === 'KRR' ? 'Краснодара' : 'Внуково') + ', ' +
+          pl.altM.toLocaleString('ru-RU') + ' м, ' + pl.kmh + ' км/ч';
+      rows.push(['Самолёт сейчас', where + (pl.est ? ' (оценка)' : ''),
+        'https://www.flightradar24.com/' + pl.call + '/' + pl.id]);
+    } else if(S.planeSeen && (ph !== 'landed' && ph !== 'cancelled')){
+      // самолёта нет в эфире — ссылка ведёт на страницу борта, где видно, когда он появится
+      rows.push(['Самолёт сейчас', 'не виден на Flightradar24', S.planeReg
+        ? 'https://www.flightradar24.com/data/aircraft/' + S.planeReg.toLowerCase()
+        : 'https://www.flightradar24.com/data/flights/dp158']);
+    }
+
+    $('status').dataset.tone = tone; $('route').dataset.tone = tone; $('steps').dataset.tone = tone;
+    set('stLabel', label);
+    var kv = $('kv'), sig = JSON.stringify(rows);
+    if(kv._sig !== sig){
+      kv._sig = sig; kv.textContent = '';
+      rows.forEach(function(r){
+        var row = document.createElement('div'), dt = document.createElement('dt'), dd = document.createElement('dd');
+        dt.textContent = r[0];
+        if(r[2]){
+          var ln = document.createElement('a'); ln.href = r[2]; ln.target = '_blank'; ln.rel = 'noopener'; ln.textContent = r[1];
+          dd.appendChild(ln);
+        } else dd.textContent = r[1];
+        row.appendChild(dt); row.appendChild(dd); kv.appendChild(row);
+      });
+    }
+
+    // маршрут
+    var pct = 0;
+    if(ph === 'landed') pct = 100;
+    else if(ph === 'airborne'){
+      var t0 = new Date(d.actual).getTime(), t1 = new Date(a.best).getTime();
+      pct = Math.min(96, Math.max(4, (now - t0) / Math.max(1, t1 - t0) * 100));
+    }
+    $('fill').style.width = pct + '%'; $('plane').style.left = pct + '%';
+
+    set('depK', d.actual ? 'Вылетел' : 'Вылет');
+    set('depV', hm(d.actual || d.est));
+    var depN = $('depN');
+    var depNote = late ? 'по расписанию <s>' + hm(d.sched) + '</s>' : 'по расписанию';
+    if(real) depNote = 'по табло; ' + (d.realBound ? 'не раньше' : 'прогноз') + ' ≈' + hm(real);
+    if(depN.innerHTML !== depNote) depN.innerHTML = depNote;
+
+    set('arrK', a.actual ? 'Прилетел' : 'Прилёт');
+    set('arrV', (a.bestSrc === 'calc' ? '≈' : '') + hm(a.best));
+    var arrNote = { fact: 'фактическое время', board: 'по табло Внуково', fa: 'оценка FlightAware',
+      calc: a.calcFrom === 'takeoff' ? 'расчёт: взлёт + ' + dur(a.airMin * 60000)
+        : 'расчёт: вылет + ' + dur(a.blockMin * 60000) }[a.bestSrc] || '';
+    if(a.bestSrc === 'calc' && a.board) arrNote += '. По табло Внуково: ' + hm(a.board);
+    set('arrN', arrNote);
+
+    // ограничения в аэропорту Краснодара
+    var sky = $('sky'), al = S.alert;
+    var fresh = al && al.until && now - new Date(al.until).getTime() < 6 * 3600000;
+    var anyAlert = (S.alerts || []).some(function(x){ return x.active; });
+    // блок нужен только пока аэропорт закрыт
+    if(al && al.active && !d.actual && ph !== 'cancelled'){
+      sky.hidden = false;
+      if(!al.active && !fresh){
+        sky.dataset.tone = 'warn';
+        set('skyT', 'Аэропорт Краснодара открыт, в городе опасность БПЛА');
+        set('skyN', '');
+      } else if(al.active){
+        var t0 = new Date(al.since).getTime();
+        var lift = t0 + (al.expectHiMin || al.expectMin || al.typicalMin || 0) * 60000;
+        var liftText = al.expectLoMin
+          ? hm(new Date(t0 + al.expectLoMin * 60000).toISOString()) + '–' + hm(new Date(lift).toISOString())
+          : hm(new Date(lift).toISOString());
+        sky.dataset.tone = 'bad';
+        set('skyT', 'Аэропорт Краснодара закрыт');
+        set('skyN', 'С ' + hm(al.since) + ', уже ' + dur(now - new Date(al.since).getTime()) +
+          (al.n && lift > now ? '\nОткроют около: ' + liftText : ''));
+      } else {
+        sky.dataset.tone = 'ok';
+        set('skyT', 'Аэропорт Краснодара открыт');
+        set('skyN', 'С ' + hm(al.until) + (real ? '\nВылет не раньше: ≈' + hm(real) : ''));
+      }
+      $('skyN').hidden = !$('skyN').textContent;
+    } else sky.hidden = true;
+
+    // когда выезжать: дорога 1:10–1:30, 10 минут на парковку, Алина выходит через 20 минут после прилёта
+    var meet = new Date(a.best).getTime() + 20 * 60000, leave = meet - (90 + 10) * 60000;
+    var lv = $('leave'), flying = ph === 'airborne';
+    if(ph === 'cancelled'){ lv.dataset.tone = 'idle'; set('lvV', '—'); set('lvN', 'Рейс отменён, ехать не нужно.'); }
+    else if(ph === 'landed'){
+      lv.dataset.tone = 'ok'; set('lvV', hm(new Date(leave).toISOString()));
+      set('lvN', 'Самолёт сел. Выход из терминала около ' + hm(new Date(meet).toISOString()) + '.');
+    }
+    else {
+      set('lvV', (a.bestSrc === 'calc' ? '≈' : '') + hmDay(new Date(leave).toISOString()));
+      var tail = ' Выход из терминала около ' + hm(new Date(meet).toISOString()) + '.';
+      if(leave > now){
+        lv.dataset.tone = flying ? 'ok' : 'idle';
+        set('lvN', 'Через ' + dur(leave - now) + '.' + tail + (flying ? '' : ' Сдвинется вместе с вылетом.'));
+      } else {
+        lv.dataset.tone = 'warn';
+        set('lvN', 'Пора ехать.' + tail);
+      }
+    }
+
+    set('fGate', d.gate || '—'); set('fTerm', d.terminal || '—'); set('fDesks', d.desks || '—');
+    set('fArrTerm', a.terminal ? 'терминал ' + a.terminal : '—');
+    set('fBelt', a.belt ? 'лента ' + a.belt : '—');
+    set('fBlock', dur(a.blockMin * 60000));
+  }
+
+  function paintSteps(){
+    var list = (S && S.steps) || [], sig = JSON.stringify(list), ol = $('steps');
+    if(ol._sig === sig) return; ol._sig = sig; ol.textContent = '';
+    var cur = -1;
+    list.some(function(s, n){ if(!s.done){ cur = n; return true; } return false; });
+    list.forEach(function(s, n){
+      var li = document.createElement('li'), mk = document.createElement('i'),
+          nm = document.createElement('span'), tm = document.createElement('time');
+      li.className = s.done ? 'done' : (n === cur ? 'now' : '');
+      mk.className = 'mk'; nm.className = 'nm'; nm.textContent = s.t;
+      tm.textContent = s.done ? (s.at ? hm(s.at) : '') : (s.est ? '≈' + hm(s.est) : '');
+      li.appendChild(mk); li.appendChild(nm); li.appendChild(tm); ol.appendChild(li);
+    });
+    ol.hidden = !list.length;
+  }
+
+  // строки каналов мэра, РСЧС и «Радара» с блока убраны; их смена статуса попадает в историю
+  function paintAlerts(){ $('skyList').hidden = true; }
+
+  var logKey = '';
+  function paintLog(){
+    if(!S) return;
+    var items = S.log || [], key = items.length + '|' + (items[0] ? items[0].at + items[0].text : '');
+    if(key === logKey) return; logKey = key;
+    var ol = $('log'); ol.textContent = '';
+    items.forEach(function(it){
+      var li = document.createElement('li'), t = document.createElement('time'), s = document.createElement('span');
+      t.textContent = hm(it.at); s.textContent = it.text; li.appendChild(t); li.appendChild(s); ol.appendChild(li);
+    });
+    var groups = [
+      { keys: ['krr', 'tg'], name: 'табло и телеграм-канал аэропорта Краснодар' },
+      { keys: ['city'], name: 'канал мэра' },
+      { keys: ['rschs'], name: 'оповещения РСЧС' },
+      { keys: ['radar'], name: '«Радар»' },
+      { keys: ['yaKrr', 'yaVko'], name: 'Яндекс Расписания' },
+      { keys: ['fr'], name: 'Flightradar24' },
+      { keys: ['fa'], name: 'FlightAware' }
+    ];
+    var src = $('srcList'); src.textContent = 'Источники: ';
+    groups.forEach(function(g, i){
+      var ok = g.keys.every(function(k){ return ((S.sources || {})[k] || {}).ok; });
+      var el = document.createElement(ok ? 'b' : 'span');
+      if(!ok) el.className = 'off';
+      el.textContent = g.name + (ok ? '' : ' (не отвечает)');
+      if(i) src.appendChild(document.createTextNode(', '));
+      src.appendChild(el);
+    });
+    src.appendChild(document.createTextNode('.'));
+  }
+
+  function accept(data){ S = data; linkError = ''; logKey = ''; paint(); paintLog(); paintAlerts(); paintSteps(); }
+
+  function pollLocal(){
+    fetch('state.json?t=' + Date.now(), {cache: 'no-store'})
+      .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+      .then(accept)
+      .catch(function(){ if(!S){ linkError = 'нет связи с трекером'; paint(); } });
+  }
+
+  // публичная копия на GitHub Pages берёт данные из gist
+  function pollGist(){
+    fetch('https://api.github.com/gists/' + window.DP158_GIST, {cache: 'no-store'})
+      .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function(g){ accept(JSON.parse(g.files['state.json'].content)); })
+      .catch(function(){ if(!S){ linkError = 'нет связи с GitHub'; paint(); } });
+  }
+
+  function start(){
+    if(window.DP158_GIST){ pollGist(); setInterval(pollGist, 70000); return; }
+    var c = window.claude;
+    if(!c || !c.use){ pollLocal(); setInterval(pollLocal, 10000); return; }
+    c.use('db').then(function(db){
+      if(!db){ linkError = 'откройте страницу в Claude, чтобы видеть данные'; paint(); return; }
+      db.doc('flights/dp158').onSnapshot(function(snap){
+        if(snap.exists) accept(snap.data());
+      }, function(){ linkError = 'связь с данными оборвалась, обновите страницу'; paint(); });
+    });
+  }
+
+  paint();
+  setInterval(paint, 1000);
+  start();
+})();
+</script>
+</body></html>
