@@ -239,7 +239,8 @@ p,h1,h2,ol,dl,dd{margin:0}
     }
     else {
       tone = late ? 'warn' : 'ok';
-      if(ph === 'gate_closed'){ label = 'Посадка закончена'; tone = 'air'; }
+      if(ph === 'departing'){ label = 'Отправляется'; tone = 'air'; }
+      else if(ph === 'gate_closed'){ label = 'Посадка закончена'; tone = 'air'; }
       else if(ph === 'boarding'){ label = 'Идёт посадка'; tone = 'air'; }
       else if(ph === 'checkin'){ label = late ? 'Задержан' : 'Идёт регистрация'; }
       else if(ph === 'delayed'){ label = 'Задержан'; }
