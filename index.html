@@ -336,7 +336,7 @@ p,h1,h2,ol,dl,dd{margin:0}
       $('skyN').hidden = !$('skyN').textContent;
     } else sky.hidden = true;
 
-    // когда выезжать: дорога 1:10–1:30, 10 минут на парковку, Алина выходит через 20 минут после прилёта
+    // когда выезжать: дорога 1:10–1:30, 10 минут на парковку, пассажир выходит через 20 минут после прилёта
     var meet = new Date(a.best).getTime() + 20 * 60000, leave = meet - (90 + 10) * 60000;
     var lv = $('leave'), flying = ph === 'airborne';
     if(ph === 'cancelled'){ lv.dataset.tone = 'idle'; set('lvV', '—'); set('lvN', 'Рейс отменён, ехать не нужно.'); }
