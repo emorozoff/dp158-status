@@ -187,7 +187,7 @@
   // ── часы демо: вечер идёт быстро, полёт в Москву ещё быстрее, после посадки — пауза и заново ──
   var START = T('17:26');
   var PACE = [[TAKEOFF + 4 * MIN, 4], [LANDED, 8], [LANDED + 8 * MIN, 1]];   // до какого момента, минут в секунду
-  var elapsed = 0, paused = false, total = 0;
+  var elapsed = 0, total = 0;
   (function(){ var from = START; PACE.forEach(function(s){ total += (s[0] - from) / MIN / s[1]; from = s[0]; }); })();
 
   function now(){
@@ -212,42 +212,16 @@
     return 0;
   }
 
-  function bar(restart){
-    var css = document.createElement('style');
-    css.textContent = '.demo{display:flex;align-items:center;gap:6px 12px;flex-wrap:wrap;font-size:.75rem;color:var(--muted);' +
-      'border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:-6px}' +
-      '.demo b{font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--accent)}' +
-      '.demo .gap{flex:1}' +
-      '.demo button{font:inherit;color:var(--ink);background:none;border:1px solid var(--line);border-radius:999px;' +
-      'padding:3px 11px;cursor:pointer}.demo button:hover{border-color:var(--muted)}';
-    document.head.appendChild(css);
-    var el = document.createElement('div'); el.className = 'demo';
-    el.innerHTML = '<b>Демо</b><span class="num" id="demoClock"></span><span class="gap"></span>' +
-      '<button type="button" id="demoPause">Пауза</button><button type="button" id="demoAgain">Сначала</button>';
-    var wrap = document.querySelector('.wrap'); wrap.insertBefore(el, wrap.firstChild);
-    document.getElementById('demoPause').onclick = function(){
-      paused = !paused; this.textContent = paused ? 'Дальше' : 'Пауза';
-    };
-    document.getElementById('demoAgain').onclick = restart;
-  }
-
   function run(accept){
-    var last = performance.now(), clock;
-    function restart(){ elapsed = 0; frame(); }
+    var last = performance.now();
     function frame(){
-      var t = now();
       // «сверено N с назад» — в настоящих секундах, сверка будто бы раз в четыре секунды
-      accept(stateAt(t, (1 + elapsed % 4) * 1000));
-      var text = (t >= T('00:00', true) ? '5 окт, ' : '4 окт, ') + hm(t);
-      if(clock.textContent !== text) clock.textContent = text;
+      accept(stateAt(now(), (1 + elapsed % 4) * 1000));
     }
-    bar(restart);
-    clock = document.getElementById('demoClock');
     elapsed = seek();
     frame();
     setInterval(function(){
       var t = performance.now(), dt = Math.min(.5, (t - last) / 1000); last = t;   // свёрнутая вкладка не проматывает запись
-      if(paused) return;
       elapsed += dt;
       if(elapsed >= total) elapsed = 0;
       frame();
