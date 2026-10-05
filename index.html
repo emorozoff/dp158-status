@@ -1,4 +1,4 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex"><style>body{margin:0}[hidden]{display:none!important}</style><script>window.DP158_GIST="822bd9d43c806727b9f493c15364e713";</script></head><body><title>Рейс DP 158</title>
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex"><style>body{margin:0}[hidden]{display:none!important}</style><script src="demo.js"></script></head><body><title>Рейс DP 158 · демо</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Martian+Mono:wdth,wght@75..112.5,100..800&display=swap">
 <style>
 /* Layout: одна узкая колонка, как посадочный талон — статус, маршрут с двумя временами, детали, лента изменений */
@@ -176,6 +176,9 @@ p,h1,h2,ol,dl,dd{margin:0}
 (function(){
   var TZ = 'Europe/Moscow';
   var S = null, linkError = '';
+  // демо-режим (demo.js): время и данные берутся из записи, а не из сети
+  var demo = window.DP158_DEMO;
+  function clock(){ return demo ? demo.now() : Date.now(); }
   var $ = function(id){ return document.getElementById(id); };
 
   function hm(iso){
@@ -211,7 +214,7 @@ p,h1,h2,ol,dl,dd{margin:0}
   }
 
   function paint(){
-    var now = Date.now();
+    var now = clock();
     paintFresh(now);
     if(!S) return;
     var d = S.dep, a = S.arr, ph = S.phase, late = S.delayMin >= 15;
@@ -432,6 +435,7 @@ p,h1,h2,ol,dl,dd{margin:0}
   }
 
   function start(){
+    if(demo){ demo.run(accept); return; }
     if(window.DP158_GIST){ pollGist(); setInterval(pollGist, 70000); return; }
     var c = window.claude;
     if(!c || !c.use){ pollLocal(); setInterval(pollLocal, 10000); return; }
